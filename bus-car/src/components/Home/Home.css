@@ -1,0 +1,16 @@
+.div-color {
+    background-color: #4457ff;
+    min-width: 500px;
+    min-height: 300px;
+}
+
+.routes-container{
+    display: flex;
+    gap: 20px;
+    overflow-y: scroll;
+}
+
+#map-container{
+    background-color: aquamarine;
+    min-width: 80%;
+}
