@@ -1,9 +1,11 @@
 import './App.css';
 import AppContent from './AppContent';
-
+import { SessionProvider } from './components/SessionContext';
 function App() {
   return (
-    <AppContent/>
+    <SessionProvider>
+      <AppContent/>
+    </SessionProvider>
   );
 }
 

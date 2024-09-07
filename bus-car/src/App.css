@@ -9,16 +9,3 @@ html, body, #root {
   position: relative; /* Necesario para el posicionamiento absoluto del botón */
 }
 
-.back-button {
-  position: absolute;
-  top: 20px; /* Ajusta según prefieras */
-  left: 20px; /* Mueve el botón a la izquierda */
-  padding: 10px 20px;
-  font-size: 16px;
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  z-index: 1000; /* Asegura que el botón esté por encima del mapa */
-}
