@@ -2,6 +2,8 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Home.css';
 import Map from '../Map/Map';
+import LocationsList from '../Map/LocationsList';
+
 
 function Home() {
   const navigate = useNavigate();
@@ -12,7 +14,7 @@ function Home() {
 
   return (
     <div className="p-5">
-      <div><h1>Bus-car Rutas</h1></div>
+      <div><h1>Bus-car ubicaciones</h1></div>
 
       <div className="mb-3">
         <input type="text" className="form-control" placeholder="Buscar ruta" />
@@ -31,6 +33,7 @@ function Home() {
       </div>
 
       <div id="map-container">
+        <LocationsList/>
         <Map />
       </div>
     </div>
