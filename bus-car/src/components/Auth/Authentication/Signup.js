@@ -2,44 +2,32 @@ import React, { useRef } from 'react';
 import { useContext } from 'react';
 import { SessionContext } from './SessionContext'; // Importar el contexto
 import { jwtDecode } from "jwt-decode";
+import { signupUser } from '../../../api/authApi'; // Importar la función de autenticación
 
 const Signup = ({ setShow }) => {
   const formRef = useRef();
   const { setCurrUser } = useContext(SessionContext); // Acceder al contexto
 
-  const signup = async (userInfo) => {
-    const url = 'http://localhost:3000/signup';
-    try {
-      const response = await fetch(url, {
-        method: 'post',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
-        body: JSON.stringify(userInfo),
-      });
-      const data = await response.json();
-      if (!response.ok) throw data.error;
-
-      const token = response.headers.get('Authorization');
-      localStorage.setItem('token', token);
-
-      // Decodifica el token y actualiza el estado del contexto
-      const decodedToken = jwtDecode(token);
-      setCurrUser(decodedToken);
-    } catch (error) {
-      console.log('error', error);
-    }
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData(formRef.current);
     const data = Object.fromEntries(formData);
     const userInfo = {
       user: { email: data.email, password: data.password },
     };
-    signup(userInfo);
+
+    try {
+      const token = await signupUser(userInfo);
+      
+      // Decodifica el token y actualiza el estado del contexto
+      const decodedToken = jwtDecode(token);
+      setCurrUser(decodedToken);
+
+      // Opcional: Redirigir o hacer algo después del registro exitoso
+    } catch (error) {
+      console.log('Error during signup:', error);
+    }
+
     e.target.reset();
   };
 

@@ -4,11 +4,6 @@
     min-height: 300px;
 }
 
-.routes-container{
-    display: flex;
-    gap: 20px;
-    overflow-y: scroll;
-}
 
 #map-container{
     

@@ -1,0 +1,41 @@
+/* Contenedor para el desplazamiento horizontal */
+.route-list-container {
+    width: 100%;
+  }
+  
+  .route-list-wrapper {
+    display: flex;
+    overflow-x: auto; /* Habilitar scroll horizontal */
+    overflow-y: hidden; /* Desactivar scroll vertical */
+    white-space: nowrap; /* Evitar salto de línea para elementos flexibles */
+    padding-bottom: 10px;
+    scroll-behavior: smooth; /* Suavizar el desplazamiento */
+  }
+  
+  .route-item {
+    flex: 0 0 200px; /* Todos los items tendrán un ancho fijo de 200px */
+    height: 150px; /* Altura fija */
+    margin-right: 15px; /* Espaciado entre los elementos */
+    display: inline-block;
+    transition: transform 0.3s ease;
+  }
+  
+  .route-item button {
+    transition: transform 0.3s ease;
+    height: 100%;
+  }
+  
+  .route-item button:hover {
+    transform: scale(1.05); /* Animación al pasar el mouse */
+  }
+  
+  /* Estilos adicionales para ocultar la barra de scroll en navegadores Webkit (opcional) */
+  .route-list-wrapper::-webkit-scrollbar {
+    height: 8px; /* Altura de la barra de scroll */
+  }
+  
+  .route-list-wrapper::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2); /* Color de la barra de scroll */
+    border-radius: 10px;
+  }
+  

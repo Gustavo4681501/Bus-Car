@@ -1,44 +1,29 @@
-import React, { useRef } from 'react';
-import { useContext } from 'react';
+import React, { useRef, useContext } from 'react';
 import { SessionContext } from './SessionContext'; // Importar el contexto
-import { jwtDecode } from "jwt-decode";
+import { jwtDecode } from 'jwt-decode';
+import { loginUser } from '../../../api/authApi'; // Importar la función de autenticación
+
 const Login = ({ setShow }) => {
   const formRef = useRef();
   const { setCurrUser } = useContext(SessionContext); // Acceder al contexto
 
-  const login = async (userInfo) => {
-    const url = 'http://localhost:3000/login';
-    try {
-      const response = await fetch(url, {
-        method: 'post',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
-        body: JSON.stringify(userInfo),
-      });
-      const data = await response.json();
-      if (!response.ok) throw data.error;
-
-      const token = response.headers.get('Authorization');
-      localStorage.setItem('token', token);
-
-      // Decodifica el token y actualiza el estado del contexto
-      const decodedToken = jwtDecode(token);
-      setCurrUser(decodedToken);
-    } catch (error) {
-      console.log('error', error);
-    }
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData(formRef.current);
     const data = Object.fromEntries(formData);
     const userInfo = {
       user: { email: data.email, password: data.password },
     };
-    login(userInfo);
+
+    try {
+      const token = await loginUser(userInfo);
+      // Decodifica el token y actualiza el estado del contexto
+      const decodedToken = jwtDecode(token);
+      setCurrUser(decodedToken);
+    } catch (error) {
+      console.log('Error logging in:', error);
+    }
+
     e.target.reset();
   };
 
@@ -59,6 +44,9 @@ const Login = ({ setShow }) => {
       <br />
       <div>
         Not registered yet, <a href="#signup" onClick={handleClick}>Signup</a>
+      </div>
+      <div>
+        Forgot your password, <a href="ResetPassword">Reset Password</a>
       </div>
     </div>
   );

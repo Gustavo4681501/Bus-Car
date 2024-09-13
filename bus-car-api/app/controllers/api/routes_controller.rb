@@ -1,4 +1,4 @@
-class RoutesController < ApplicationController
+class Api::RoutesController < ApplicationController
   before_action :set_route, only: [:show, :update, :destroy]
 
   def index

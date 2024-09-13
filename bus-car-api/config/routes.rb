@@ -23,8 +23,7 @@ Rails.application.routes.draw do
       resources :locations, only: [:index, :create, :destroy] do
         delete 'destroy', on: :collection, to: 'locations#destroy'
       end
-      resources :routes, only: [:index, :create, :destroy]
-      patch 'locations/:id/hide', to: 'locations#hide'
+      resources :routes, only: [:index, :show, :create, :destroy]
     end
     
 end

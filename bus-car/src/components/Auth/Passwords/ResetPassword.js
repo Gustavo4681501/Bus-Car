@@ -39,7 +39,7 @@ const ResetPassword = () => {
 
       setSuccess(true);
       setTimeout(() => {
-        navigate('/login');
+        navigate('/');
       }, 2000);
     } catch (error) {
       setError(error.message);
@@ -50,7 +50,7 @@ const ResetPassword = () => {
     <div>
       <h2>Reset Password</h2>
       {success ? (
-        <p>Password reset successfully! Redirecting to login...</p>
+        <p>Password reset successfully! Redirecting to home...</p>
       ) : (
         <form onSubmit={handleSubmit}>
           <div>

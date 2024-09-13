@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef, memo } from 'react';
 import { DirectionsRenderer, GoogleMap, LoadScript, Marker, Polyline } from '@react-google-maps/api';
+import { saveRoute } from '../../api/routeApi'; // Importa la función saveRoute
 
 const API_KEY = "AIzaSyC9daW8QnV6HJ6UoxwoKr16lcK08xMvrmY";
 
 const containerStyle = {
   width: '80vw',
-  height: '80vh' // Tamaño del mapa
+  height: '80vh'
 };
 
 const mapOptions = {
@@ -30,7 +31,7 @@ const MapComponent = memo(({ mapOptions, route, directions, points, userLocation
     {userLocation && (
       <Marker
         position={userLocation}
-        icon='http://maps.google.com/mapfiles/ms/icons/blue-dot.png' // Usa el icono azul para la ubicación del usuario
+        icon='http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
       />
     )}
   </GoogleMap>
@@ -55,7 +56,7 @@ function InteractiveRouteForm({ onRouteCreated }) {
 
           if (mapRef.current) {
             mapRef.current.setCenter(newLocation);
-            mapRef.current.setZoom(14); // Ajusta el zoom según sea necesario
+            mapRef.current.setZoom(14);
           }
         },
         (error) => console.error('Error getting location:', error),
@@ -125,33 +126,15 @@ function InteractiveRouteForm({ onRouteCreated }) {
   };
 
   const handleSaveRoute = () => {
-    const waypoints = points.map(p => ({ lat: p.lat, lng: p.lng }));
-    fetch('http://localhost:3000/routes', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ route: { name: 'New Route', waypoints: JSON.stringify(waypoints) } }),
-    })
-      .then(response => response.json())
+    saveRoute(points)
       .then(data => onRouteCreated(data))
       .catch(error => console.error('Error creating route:', error));
-  };
-
-  const handleToggleFullscreen = () => {
-    const mapContainer = document.getElementById('map-container');
-    if (document.fullscreenElement) {
-      document.exitFullscreen();
-    } else {
-      mapContainer.requestFullscreen();
-    }
   };
 
   return (
     <div style={{ padding: '20px' }}>
       <div style={{ marginBottom: '20px' }}>
         <button onClick={handleSaveRoute}>Save Route</button>
-        <button onClick={handleToggleFullscreen}>Toggle Fullscreen</button>
       </div>
       <LoadScript googleMapsApiKey={API_KEY}>
         <MapComponent
@@ -159,7 +142,7 @@ function InteractiveRouteForm({ onRouteCreated }) {
           route={route}
           directions={directions}
           points={points}
-          userLocation={userLocation} // Añadido para mostrar la ubicación del usuario
+          userLocation={userLocation}
           handleMapLoad={handleMapLoad}
         />
       </LoadScript>

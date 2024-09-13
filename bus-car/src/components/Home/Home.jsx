@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import './Home.css';
 import Map from '../Map/Map';
 import LocationsList from '../Map/LocationsList';
-
+import RouteList from '../Routes/RouteList';
+import InteractiveRouteForm from '../Routes/InteractiveRouteForm';
 
 function Home() {
   const navigate = useNavigate();
@@ -20,21 +21,15 @@ function Home() {
         <input type="text" className="form-control" placeholder="Buscar ruta" />
       </div>
 
-      <div className="routes-container mb-3">
-        {[...Array(9)].map((_, index) => (
-          <div 
-            key={index}
-            className="div-color"
-            onClick={handleRouteClick}
-          >
-            <h1>Ruta</h1>
-          </div>
-        ))}
-      </div>
+      
 
-      <div id="map-container">
-        <LocationsList/>
-        <Map />
+      <div className="map-container">
+        <div id="map-container">
+          <LocationsList/>
+          <RouteList/>
+        <InteractiveRouteForm onRouteCreated={(newRoute) => console.log(newRoute)} />
+          <Map />
+        </div>
       </div>
     </div>
   );

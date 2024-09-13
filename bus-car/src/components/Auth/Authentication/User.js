@@ -3,7 +3,7 @@ import { SessionContext } from './SessionContext'; // Importar el contexto
 import Signup from './Signup';
 import Login from './Login';
 import Logout from './Logout';
-import PrivateText from './PrivateText';
+import PrivateText from '../../PrivateText';
 
 const User = () => {
   const { currUser, setCurrUser } = useContext(SessionContext); // Acceder al contexto
