@@ -5,6 +5,7 @@ import Map from '../Map/Map';
 import LocationsList from '../Map/LocationsList';
 import RouteList from '../Routes/RouteList';
 import InteractiveRouteForm from '../Routes/InteractiveRouteForm';
+import LocationManager from '../Routes/LocationManager/LocationManager';
 
 function Home() {
   const navigate = useNavigate();
@@ -25,6 +26,7 @@ function Home() {
 
       <div className="map-container">
         <div id="map-container">
+        <LocationManager />
           <LocationsList/>
           <RouteList/>
         <InteractiveRouteForm onRouteCreated={(newRoute) => console.log(newRoute)} />

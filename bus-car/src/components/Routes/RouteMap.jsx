@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { GoogleMap, LoadScript, DirectionsRenderer } from '@react-google-maps/api';
-import { fetchRouteDetails } from '../../api/routeApi'; // Importa la función fetchRouteDetails
+import { GoogleMap, LoadScript, DirectionsRenderer, Marker } from '@react-google-maps/api';
+import { fetchRouteDetails } from '../../api/routeApi';
 
 const API_KEY = "AIzaSyC9daW8QnV6HJ6UoxwoKr16lcK08xMvrmY"; // Reemplaza con tu API Key
 
@@ -11,8 +11,9 @@ const containerStyle = {
 };
 
 function RouteMap() {
-  const { routeId } = useParams(); // Obtiene la ID de la ruta desde la URL
+  const { routeId } = useParams();
   const [route, setRoute] = useState(null);
+  const [locations, setLocations] = useState([]);
   const [directions, setDirections] = useState(null);
 
   useEffect(() => {
@@ -22,15 +23,13 @@ function RouteMap() {
         console.log('Raw route data:', data); // Verifica los datos crudos
 
         try {
-          // Parsear los waypoints almacenados como string
-          const waypoints = JSON.parse(data.waypoints);
-          console.log('Parsed waypoints:', waypoints); // Verifica los waypoints parseados
-
+          const waypoints = JSON.parse(data.route.waypoints);
           if (Array.isArray(waypoints) && waypoints.length > 1) {
             setRoute({
-              ...data,
+              ...data.route,
               waypoints
             });
+            setLocations(data.locations); // Guarda las ubicaciones asociadas
           } else {
             console.error('Invalid waypoints:', waypoints);
           }
@@ -45,17 +44,14 @@ function RouteMap() {
     if (route) {
       const directionsService = new window.google.maps.DirectionsService();
 
-      // Definir origen y destino
       const origin = new window.google.maps.LatLng(route.waypoints[0].lat, route.waypoints[0].lng);
       const destination = new window.google.maps.LatLng(route.waypoints[route.waypoints.length - 1].lat, route.waypoints[route.waypoints.length - 1].lng);
 
-      // Definir los puntos intermedios
       const waypoints = route.waypoints.slice(1, -1).map(point => ({
         location: new window.google.maps.LatLng(point.lat, point.lng),
         stopover: true
       }));
 
-      // Solicitar la ruta al servicio de direcciones
       directionsService.route({
         origin,
         destination,
@@ -79,6 +75,14 @@ function RouteMap() {
         zoom={14}
       >
         {directions && <DirectionsRenderer directions={directions} />}
+        
+        {/* Mostrar las ubicaciones como marcadores */}
+        {locations.map((location, index) => (
+          <Marker
+            key={index}
+            position={{ lat: location.latitude, lng: location.longitude }}
+          />
+        ))}
       </GoogleMap>
     </LoadScript>
   );

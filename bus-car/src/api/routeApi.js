@@ -40,3 +40,35 @@ export const fetchRouteDetails = (routeId) => {
       });
   };
   
+
+// src/api/routeApi.js
+
+export const addLocationToRoute = (locationId, routeId) => {
+  return fetch(`http://localhost:3000/api/locations/${locationId}/add_route`, {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ route_id: routeId }),
+  })
+  .then(response => response.json())
+  .catch(error => {
+      console.error('Error adding location to route:', error);
+      throw error;
+  });
+};
+
+export const removeLocationFromRoute = (locationId, routeId) => {
+  return fetch(`http://localhost:3000/api/locations/${locationId}/remove_route`, {
+      method: 'DELETE',
+      headers: {
+          'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ route_id: routeId }),
+  })
+  .then(response => response.json())
+  .catch(error => {
+      console.error('Error removing location from route:', error);
+      throw error;
+  });
+};
