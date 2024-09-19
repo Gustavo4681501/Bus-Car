@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, memo } from 'react';
-import { DirectionsRenderer, GoogleMap, LoadScript, Marker, Polyline } from '@react-google-maps/api';
+import { DirectionsRenderer, GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 import { saveRoute } from '../../api/routeApi'; // Importa la función saveRoute
 
 const API_KEY = "AIzaSyC9daW8QnV6HJ6UoxwoKr16lcK08xMvrmY";
@@ -14,7 +14,7 @@ const mapOptions = {
   gestureHandling: 'greedy',
 };
 
-const MapComponent = memo(({ mapOptions, route, directions, points, userLocation, handleMapLoad, handleMarkerDragEnd, handleMarkerRightClick }) => (
+const MapComponent = memo(({ mapOptions, directions, points, userLocation, handleMapLoad, handleMarkerDragEnd, handleMarkerRightClick }) => (
   <GoogleMap
     id="map-container"
     mapContainerStyle={containerStyle}
@@ -23,13 +23,6 @@ const MapComponent = memo(({ mapOptions, route, directions, points, userLocation
     zoom={14}
     center={userLocation || { lat: 0, lng: 0 }}
   >
-    {/* Mostrar Polyline solo si hay al menos dos puntos */}
-    {points.length > 1 && (
-      <Polyline
-        path={route}
-        options={{ strokeColor: '#FF0000', strokeOpacity: 1.0, strokeWeight: 2, editable: true }}
-      />
-    )}
     {directions && (
       <DirectionsRenderer
         directions={directions}
@@ -57,7 +50,6 @@ const MapComponent = memo(({ mapOptions, route, directions, points, userLocation
 function InteractiveRouteForm({ onRouteCreated }) {
   const [map, setMap] = useState(null);
   const [points, setPoints] = useState([]);
-  const [route, setRoute] = useState([]);
   const [directions, setDirections] = useState(null);
   const [userLocation, setUserLocation] = useState(null);
   const mapRef = useRef();
@@ -101,11 +93,8 @@ function InteractiveRouteForm({ onRouteCreated }) {
   useEffect(() => {
     if (points.length >= 2) {
       const newRoute = points.map(p => new window.google.maps.LatLng(p.lat, p.lng));
-      setRoute(newRoute);
       calculateAdjustedRoute(newRoute);
     } else {
-      // Limpia la ruta y direcciones si hay menos de dos puntos
-      setRoute([]);
       setDirections(null);
     }
   }, [points]);
@@ -151,23 +140,45 @@ function InteractiveRouteForm({ onRouteCreated }) {
     const lng = e.latLng.lng();
     const updatedPoints = [...points];
     updatedPoints[index] = { lat, lng };
-    setPoints(updatedPoints);
+
+    snapToRoads(updatedPoints[index])
+      .then((adjustedPoint) => {
+        updatedPoints[index] = adjustedPoint;
+        setPoints(updatedPoints);
+        calculateAdjustedRoute(updatedPoints.map(p => new window.google.maps.LatLng(p.lat, p.lng)));
+      });
   };
 
   const handleMarkerRightClick = (index) => {
     const updatedPoints = points.filter((_, i) => i !== index);
     setPoints(updatedPoints);
 
-    if (updatedPoints.length < 2) {
-      // Limpia la ruta y direcciones si hay menos de dos puntos
-      setRoute([]);
-      setDirections(null);
+    if (updatedPoints.length >= 2) {
+      calculateAdjustedRoute(updatedPoints.map(p => new window.google.maps.LatLng(p.lat, p.lng)));
     } else {
-      // Recalcular la ruta si aún hay suficientes puntos
-      const newRoute = updatedPoints.map(p => new window.google.maps.LatLng(p.lat, p.lng));
-      setRoute(newRoute);
-      calculateAdjustedRoute(newRoute);
+      setDirections(null);
     }
+  };
+
+  const snapToRoads = async (point) => {
+    if (!window.google) {
+      console.error('Google Maps API not loaded');
+      return point;
+    }
+
+    const { lat, lng } = point;
+    const response = await fetch(`https://roads.googleapis.com/v1/snapToRoads?path=${lat},${lng}&key=${API_KEY}`);
+    const data = await response.json();
+
+    if (data.snappedPoints && data.snappedPoints.length > 0) {
+      const snappedPoint = data.snappedPoints[0];
+      return {
+        lat: snappedPoint.location.latitude,
+        lng: snappedPoint.location.longitude,
+      };
+    }
+
+    return point;
   };
 
   const handleSaveRoute = () => {
@@ -188,7 +199,6 @@ function InteractiveRouteForm({ onRouteCreated }) {
       <LoadScript googleMapsApiKey={API_KEY}>
         <MapComponent
           mapOptions={mapOptions}
-          route={route}
           directions={directions}
           points={points}
           userLocation={userLocation}
