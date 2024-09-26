@@ -30,7 +30,7 @@ function Home() {
           <LocationsList/>
           <RouteList/>
         <InteractiveRouteForm onRouteCreated={(newRoute) => console.log(newRoute)} />
-          <Map />
+          {/* <Map /> */}
         </div>
       </div>
     </div>

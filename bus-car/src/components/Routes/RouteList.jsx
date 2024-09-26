@@ -21,7 +21,7 @@ function RouteList() {
   return (
     <div className="container route-list-container">
       <div className="route-list-wrapper">
-        {routes.map(route => (
+        {routes.slice().reverse().map(route => (  // Invertir el array
           <div className="route-item" key={route.id}>
             <button className="btn btn-primary w-100 h-100" onClick={() => handleRouteClick(route)}>
               {route.id}

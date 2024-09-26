@@ -17,19 +17,18 @@ function RouteMap() {
   const [directions, setDirections] = useState(null);
 
   useEffect(() => {
-    // Fetch la ruta desde la API usando la nueva función
     fetchRouteDetails(routeId)
       .then(data => {
         console.log('Raw route data:', data); // Verifica los datos crudos
 
         try {
           const waypoints = JSON.parse(data.route.waypoints);
-          if (Array.isArray(waypoints) && waypoints.length > 1) {
+          if (Array.isArray(waypoints) && waypoints.length > 0) {
             setRoute({
               ...data.route,
               waypoints
             });
-            setLocations(data.locations); // Guarda las ubicaciones asociadas
+            setLocations(data.locations);
           } else {
             console.error('Invalid waypoints:', waypoints);
           }
@@ -41,7 +40,7 @@ function RouteMap() {
   }, [routeId]);
 
   useEffect(() => {
-    if (route) {
+    if (route && route.waypoints.length > 0) {
       const directionsService = new window.google.maps.DirectionsService();
 
       const origin = new window.google.maps.LatLng(route.waypoints[0].lat, route.waypoints[0].lng);
@@ -71,7 +70,7 @@ function RouteMap() {
     <LoadScript googleMapsApiKey={API_KEY}>
       <GoogleMap
         mapContainerStyle={containerStyle}
-        center={{ lat: 9.945771786956337, lng: -84.19012069702148 }} // Coordenadas iniciales
+        center={route && route.waypoints.length > 0 ? { lat: route.waypoints[0].lat, lng: route.waypoints[0].lng } : { lat: 9.945771786956337, lng: -84.19012069702148 }} // Coordenadas iniciales
         zoom={14}
       >
         {directions && <DirectionsRenderer directions={directions} />}
