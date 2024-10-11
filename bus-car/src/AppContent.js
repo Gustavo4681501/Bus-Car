@@ -9,6 +9,7 @@ import { UserLocationContext } from './components/Location/UserLocationContext';
 import User from './components/Auth/Authentication/User';
 import ResetPasswordRequest from "./components/Auth/Passwords/ResetPasswordRequest";
 import ResetPassword from "./components/Auth/Passwords/ResetPassword";
+import EditRouteMap from './components/Routes/EditRoute';
 
 function AppContent() {
   const { currUser, setCurrUser } = useContext(SessionContext); // Usa el contexto de sesión
@@ -18,6 +19,8 @@ function AppContent() {
     // Navega al componente RouteMap con el ID de la ruta seleccionada
     Navigate(`/route/${route.id}`);
   };
+
+  
 
   return (
     <>
@@ -30,6 +33,7 @@ function AppContent() {
           <Route path="/map" element={<Map userLocation={userLocation} />} /> {/* Usa userLocation del contexto */}
           <Route path="/routes" element={<RouteList onSelectRoute={handleSelectRoute} />} />
           <Route path="/route/:routeId" element={<RouteMap />} />
+          <Route path="/edit-route/:routeId" element={<EditRouteMap/>} />
           <Route path="/ResetPassword" element={<ResetPasswordRequest />} />
           <Route path="/ResetPassword/:reset_password_token" element={<ResetPassword />} />
         </Routes>

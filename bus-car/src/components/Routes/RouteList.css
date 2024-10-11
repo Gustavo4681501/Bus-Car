@@ -1,41 +1,54 @@
 /* Contenedor para el desplazamiento horizontal */
 .route-list-container {
-    width: 100%;
-  }
-  
-  .route-list-wrapper {
-    display: flex;
-    overflow-x: auto; /* Habilitar scroll horizontal */
-    overflow-y: hidden; /* Desactivar scroll vertical */
-    white-space: nowrap; /* Evitar salto de línea para elementos flexibles */
-    padding-bottom: 10px;
-    scroll-behavior: smooth; /* Suavizar el desplazamiento */
-  }
-  
-  .route-item {
-    flex: 0 0 200px; /* Todos los items tendrán un ancho fijo de 200px */
-    height: 150px; /* Altura fija */
-    margin-right: 15px; /* Espaciado entre los elementos */
-    display: inline-block;
-    transition: transform 0.3s ease;
-  }
-  
-  .route-item button {
-    transition: transform 0.3s ease;
-    height: 100%;
-  }
-  
-  .route-item button:hover {
-    transform: scale(1.05); /* Animación al pasar el mouse */
-  }
-  
-  /* Estilos adicionales para ocultar la barra de scroll en navegadores Webkit (opcional) */
-  .route-list-wrapper::-webkit-scrollbar {
-    height: 8px; /* Altura de la barra de scroll */
-  }
-  
-  .route-list-wrapper::-webkit-scrollbar-thumb {
-    background-color: rgba(0, 0, 0, 0.2); /* Color de la barra de scroll */
-    border-radius: 10px;
-  }
-  
+  width: 100%;
+}
+
+.route-list-wrapper {
+  display: flex;
+  overflow-x: auto; /* Habilitar scroll horizontal */
+  overflow-y: hidden; /* Desactivar scroll vertical */
+  white-space: nowrap; /* Evitar salto de línea para elementos flexibles */
+  padding-bottom: 10px;
+  scroll-behavior: smooth; /* Suavizar el desplazamiento */
+}
+
+.route-item {
+  background-color: rgb(36, 36, 255); /* Color azul formal */
+  color: white; /* Color de texto blanco para contraste */
+  flex: 0 0 200px; /* Todos los items tendrán un ancho fijo de 200px */
+  height: 150px; /* Altura fija */
+  margin-right: 15px; /* Espaciado entre los elementos */
+  border-radius: 8px; /* Bordes redondeados */
+  display: flex; /* Para alinear botones en el centro */
+  flex-direction: row; /* Alinear los botones horizontalmente */
+  justify-content: space-between; /* Espacio entre los botones */
+  align-items: center; /* Centrar los botones verticalmente */
+  padding: 10px; /* Espacio interno */
+  transition: transform 0.3s ease;
+}
+
+.route-item button {
+  margin: 0 5px; /* Espacio entre los botones */
+  padding: 10px 15px; /* Relleno para los botones */
+  border: none; /* Sin borde */
+  border-radius: 5px; /* Bordes redondeados para botones */
+  cursor: pointer; /* Cursor tipo puntero */
+  background-color: rgba(255, 255, 255, 0.8); /* Color de fondo blanco semitransparente */
+  color: rgb(36, 36, 255); /* Color de texto azul */
+  font-weight: bold; /* Texto en negrita */
+  transition: background-color 0.3s ease; /* Suavizar el color de fondo al pasar el mouse */
+}
+
+.route-item button:hover {
+  background-color: rgba(255, 255, 255, 1); /* Cambiar a blanco al pasar el mouse */
+}
+
+/* Estilos adicionales para ocultar la barra de scroll en navegadores Webkit (opcional) */
+.route-list-wrapper::-webkit-scrollbar {
+  height: 8px; /* Altura de la barra de scroll */
+}
+
+.route-list-wrapper::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2); /* Color de la barra de scroll */
+  border-radius: 10px;
+}

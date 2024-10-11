@@ -35,7 +35,7 @@ class Api::RoutesController < ApplicationController
   # DELETE /api/routes/:id
   def destroy
     @route.destroy
-    head :no_content
+    render json: { message: 'Route deleted successfully' }, status: :ok
   end
 
   private
@@ -47,6 +47,6 @@ class Api::RoutesController < ApplicationController
 
   # Permit only the allowed parameters for route
   def route_params
-    params.require(:route).permit(:name, :waypoints)
+    params.require(:route).permit(:name,:origin, :destination, :via_waypoints, :bus_stops)
   end
 end

@@ -7,8 +7,6 @@ import { fetchLocations } from '../../api/locationApi'; // Importa la API de ubi
 import { getDirections } from '../../api/googleApi'; // Importa la API de Google Maps
 import './Map.css';
 
-const API_KEY = "AIzaSyC9daW8QnV6HJ6UoxwoKr16lcK08xMvrmY";
-
 const containerStyle = {
   width: '100%',
   height: '100vh',
@@ -128,7 +126,6 @@ function Map() {
 
   return (
     <div id="map-container">
-      <LoadScript googleMapsApiKey={API_KEY} onLoad={() => setIsMapsLoaded(true)}>
         <GoogleMap
           mapContainerStyle={containerStyle}
           center={userLocation || { lat: 0, lng: 0 }} // Asegúrate de que el mapa tenga un centro predeterminado
@@ -154,7 +151,6 @@ function Map() {
           )}
           {directions && <DirectionsRenderer directions={directions} />}
         </GoogleMap>
-      </LoadScript>
     </div>
   );
 }
