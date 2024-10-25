@@ -2,10 +2,11 @@ class CreateRoutes < ActiveRecord::Migration[7.1]
   def change
     create_table :routes do |t|
       t.string :name
-      t.string :origin       
-      t.string :destination 
+      t.string :origin
+      t.string :destination
       t.json :via_waypoints
       t.json :bus_stops
+      t.references :user, null: true, foreign_key: true
 
       t.timestamps
     end

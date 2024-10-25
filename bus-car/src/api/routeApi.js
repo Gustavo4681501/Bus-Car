@@ -11,7 +11,7 @@ const API_URL = 'http://localhost:3000/api/routes';
  * @returns {Promise<Object>} - La ruta creada.
  */
 export const saveRoute = async (route) => {
-  const { name, origin, destination, via_waypoints, bus_stops } = route;
+  const { name, origin, destination, via_waypoints, bus_stops, user_id } = route;
 
   try {
     const response = await axios.post(API_URL, {
@@ -21,6 +21,7 @@ export const saveRoute = async (route) => {
         destination: JSON.stringify(destination),
         via_waypoints: JSON.stringify(via_waypoints),
         bus_stops: JSON.stringify(bus_stops),
+        user_id: user_id,
       },
     });
     return response.data;
@@ -87,7 +88,6 @@ export const deleteRoute = async (routeId) => {
     throw error.response ? error.response.data : error.message;
   }
 };
-
 
 /**
  * -----------------------GET BY ID-----------------------------

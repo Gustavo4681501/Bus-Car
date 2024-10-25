@@ -34,8 +34,10 @@ ActiveRecord::Schema[7.1].define(version: 2024_09_30_152852) do
     t.string "destination"
     t.json "via_waypoints"
     t.json "bus_stops"
+    t.bigint "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_routes_on_user_id"
   end
 
   create_table "users", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -52,4 +54,5 @@ ActiveRecord::Schema[7.1].define(version: 2024_09_30_152852) do
 
   add_foreign_key "locations", "routes"
   add_foreign_key "locations", "users"
+  add_foreign_key "routes", "users"
 end

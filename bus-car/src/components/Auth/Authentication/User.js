@@ -2,7 +2,6 @@ import React, { useContext, useState } from 'react';
 import { SessionContext } from './SessionContext'; // Importar el contexto
 import Signup from './Signup';
 import Login from './Login';
-import Logout from './Logout';
 import PrivateText from '../../PrivateText';
 
 const User = () => {
@@ -14,7 +13,6 @@ const User = () => {
       <div>
         Hello {currUser.sub ? currUser.sub : 'no session'}
         <PrivateText currUser={currUser} />
-        <Logout setCurrUser={setCurrUser} />
       </div>
     );
   }

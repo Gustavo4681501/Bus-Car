@@ -1,76 +1,27 @@
-import React, { useEffect, useState, useRef, useContext } from 'react';
-import { GoogleMap, LoadScript, Marker, DirectionsRenderer } from '@react-google-maps/api';
+import React, { useEffect, useState, useRef } from 'react';
+import { GoogleMap,  Marker, DirectionsRenderer } from '@react-google-maps/api';
 import { useLocation } from 'react-router-dom';
-import { SessionContext } from '../Auth/Authentication/SessionContext';
-import { UserLocationContext } from '../Location/UserLocationContext'; // Asegúrate de que la ruta sea correcta
 import { fetchLocations } from '../../api/locationApi'; // Importa la API de ubicaciones
 import { getDirections } from '../../api/googleApi'; // Importa la API de Google Maps
+import useUserLocation from '../Location/useUserLocation'; // Importa el hook personalizado
 import './Map.css';
 
 const containerStyle = {
-  width: '100%',
-  height: '100vh',
+  width: '50vw',
+  height: '80vh',
 };
 
 const blueMarkerIcon = 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png';
 
 function Map() {
-  const { userLocation, setUserLocation } = useContext(UserLocationContext); // Obtener desde el contexto
+  const userLocation = useUserLocation(); // Usar el hook para obtener la ubicación del usuario
   const [locations, setLocations] = useState([]);
   const [directions, setDirections] = useState(null);
   const [selectedRoute, setSelectedRoute] = useState(null);
   const [isMapsLoaded, setIsMapsLoaded] = useState(false); // Estado para verificar carga de la API
   const mapRef = useRef();
-  const prevUserLocationRef = useRef(null); // Referencia para la ubicación anterior
   const { state } = useLocation();
-  const { currUser } = useContext(SessionContext);
-
-  // Intentar obtener la ubicación con reintentos si falla
-  const getUserLocation = (retries = 5) => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          const newLocation = { lat: latitude, lng: longitude };
-
-          // Actualizar la ubicación del contexto
-          setUserLocation(newLocation);
-          console.log('User location:', newLocation);
-
-          // Evitar que el mapa parpadee si la ubicación no ha cambiado significativamente
-          if (prevUserLocationRef.current && (
-            Math.abs(prevUserLocationRef.current.lat - newLocation.lat) > 0.001 ||
-            Math.abs(prevUserLocationRef.current.lng - newLocation.lng) > 0.001
-          )) {
-            // Solo actualizar el centro del mapa si la ubicación cambió significativamente
-            if (mapRef.current && isMapsLoaded) {
-              mapRef.current.panTo(newLocation); // Usar panTo para suavizar el movimiento
-              mapRef.current.setZoom(14); // Asegura que el zoom esté correcto
-            }
-          }
-          prevUserLocationRef.current = newLocation; // Actualizar la referencia
-        },
-        (error) => {
-          console.error('Error getting location:', error);
-          if (retries > 0) {
-            // Reintentar después de 3 segundos si falla
-            setTimeout(() => getUserLocation(retries - 1), 3000);
-          }
-        },
-        { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
-      );
-    }
-  };
-
-  // Actualiza la ubicación del usuario cada 10 segundos
-  useEffect(() => {
-    getUserLocation();
-    const locationInterval = setInterval(() => {
-      getUserLocation();
-    }, 10000); // Actualiza cada 10 segundos
-
-    return () => clearInterval(locationInterval);
-  }, [isMapsLoaded]);
+  
 
   // Fetch de ubicaciones de otros usuarios
   useEffect(() => {

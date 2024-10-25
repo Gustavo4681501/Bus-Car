@@ -1,6 +1,8 @@
 html, body, #root {
   height: 100%;
   margin: 0;
+  background-color: #1f1f1f;
+  color:#ffffff
 }
 
 #map-container {
@@ -8,4 +10,3 @@ html, body, #root {
   height: 100vh; /* Full viewport height */
   position: relative; /* Necesario para el posicionamiento absoluto del botón */
 }
-

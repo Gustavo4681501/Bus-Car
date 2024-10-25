@@ -1,34 +1,57 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { UserLocationContext } from '../../Location/UserLocationContext';
+import React, { useContext, useEffect, useState } from 'react'; 
 import { SessionContext } from '../../Auth/Authentication/SessionContext';
 import { fetchLocationByUserId, createLocation, removeLocationByUserId, updateLocation } from '../../../api/locationApi';
 import { fetchRoutes } from '../../../api/routeApi';
+import useUserLocation from '../../Location/useUserLocation'; // Importa tu hook personalizado
+import 'bootstrap/dist/css/bootstrap.min.css'; // Importa Bootstrap
 
 const LocationManager = () => {
-  const { userLocation } = useContext(UserLocationContext);
+  const userLocation = useUserLocation(); // Hook personalizado para obtener la ubicación
   const { currUser } = useContext(SessionContext);
   const [location, setLocation] = useState(null);
   const [routes, setRoutes] = useState([]);
-  const [selectedRoute, setSelectedRoute] = useState(null);
+  const [selectedRoute, setSelectedRoute] = useState('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (currUser) {
-      // Fetch routes
       fetchRoutes()
         .then(setRoutes)
         .catch(console.error);
 
-      // Fetch location for the current user
       fetchLocationByUserId(currUser.sub)
-        .then(setLocation)
-        .catch(() => setLocation(null)) // Handle case where location is not found
+        .then(locationData => {
+          setLocation(locationData);
+          if (locationData?.route_id) {
+            setSelectedRoute(locationData.route_id);
+          } else {
+            setSelectedRoute('');
+          }
+        })
+        .catch(() => setLocation(null))
         .finally(() => setLoading(false));
+    } else {
+      setLoading(false);
     }
   }, [currUser]);
 
+  //este debe ser el que envia la location al api hacer global
+  useEffect(() => {
+    if (currUser && userLocation) {
+      if (!location || location.latitude !== userLocation.lat || location.longitude !== userLocation.lng) {
+        updateLocation(currUser.sub, {
+          latitude: userLocation.lat,
+          longitude: userLocation.lng
+        }).then(updatedLocation => {
+          setLocation(updatedLocation);
+        })
+          .catch(console.error);
+      }
+    }
+  }, [currUser, userLocation]);
+
   const handleAddLocation = () => {
-    if (userLocation) {
+    if (userLocation && currUser) {
       createLocation({
         user_id: currUser.sub,
         latitude: userLocation.lat,
@@ -36,16 +59,24 @@ const LocationManager = () => {
       })
         .then(newLocation => {
           setLocation(newLocation);
+          if (selectedRoute) {
+            return updateLocation(currUser.sub, { ...newLocation, route_id: selectedRoute });
+          }
+          return newLocation;
+        })
+        .then(updatedLocation => {
+          setLocation(updatedLocation);
         })
         .catch(console.error);
     }
   };
 
   const handleRemoveLocation = () => {
-    if (currUser.sub) {
+    if (currUser?.sub) {
       removeLocationByUserId(currUser.sub)
         .then(() => {
           setLocation(null);
+          setSelectedRoute('');
         })
         .catch(console.error);
     }
@@ -53,14 +84,10 @@ const LocationManager = () => {
 
   const handleSelectRoute = (event) => {
     const routeId = event.target.value;
-    const selected = routes.find(route => route.id === routeId);
-    setSelectedRoute(selected);
+    setSelectedRoute(routeId);
 
-    if (location && routeId) {
-      // Exclude unnecessary fields before updating the location
+    if (location && routeId && currUser) {
       const { id, created_at, updated_at, ...locationData } = location;
-      
-      // Update the location with the selected route
       updateLocation(currUser.sub, { ...locationData, route_id: routeId })
         .then(updatedLocation => {
           setLocation(updatedLocation);
@@ -70,55 +97,62 @@ const LocationManager = () => {
   };
 
   const handleRemoveRoute = () => {
-    if (location && selectedRoute) {
-      // Exclude unnecessary fields before updating the location
+    if (location && currUser) {
       const { id, created_at, updated_at, ...locationData } = location;
-
       updateLocation(currUser.sub, { ...locationData, route_id: null })
         .then(updatedLocation => {
           setLocation(updatedLocation);
-          setSelectedRoute(null);
+          setSelectedRoute('');
         })
         .catch(console.error);
     }
   };
 
-  
-
   if (loading) {
-    return <div>Loading...</div>;
+    return <div className="text-center">cargando...</div>;
+  }
+
+  if (!currUser) {
+    return <div className="text-center">Log in.</div>;
   }
 
   return (
-    <div>
-      <h2>Location Manager</h2>
+    <div className="container mt-5">
+      <h2 className="text-center mb-4">Ubicaciones</h2>
       {userLocation && !location ? (
-        <button onClick={handleAddLocation}>Add Location</button>
+        <div className="text-center">
+          <button className="btn btn-primary" onClick={handleAddLocation}>Añadir  ubicación</button>
+
+        </div>
       ) : location ? (
-        <div>
-          <button onClick={handleRemoveLocation}>Remove Location</button>
+        <div className="card p-4">
+          <div className="d-flex justify-content-between">
+            <button className="btn btn-danger" onClick={handleRemoveLocation}>Eliminar ubicación</button>
+            <h3>Ubicacion actual</h3>
+          </div>
           {routes.length > 0 && (
-            <div>
-              <h3>Select Route</h3>
+            <div className="mt-3">
+              <h3>Seleccionar Ruta</h3>
               <select
-                value={selectedRoute ? selectedRoute.id : ''}
+                className="form-select"
+                value={selectedRoute}
                 onChange={handleSelectRoute}
               >
-                <option value="">Select a route</option>
+                <option value="">Seleccionar</option>
                 {routes.map(route => (
                   <option key={route.id} value={route.id}>
-                    {route.id}
+                    {route.name} {/* Muestra el nombre de la ruta */}
                   </option>
                 ))}
               </select>
               {selectedRoute && (
-                <button onClick={handleRemoveRoute}>Remove Route from Location</button>
+                <button className="btn btn-warning mt-2" onClick={handleRemoveRoute}>Quitar mi ubicacion de la ruta</button>
               )}
             </div>
           )}
         </div>
       ) : (
-        <div>No location available</div>
+        <div className="text-center">Ubicacion no disponible</div>
       )}
     </div>
   );

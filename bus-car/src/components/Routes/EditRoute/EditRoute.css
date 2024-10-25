@@ -1,0 +1,21 @@
+/* Estilos para el botón de guardar ruta */
+.save-route-button {
+    position: absolute;
+    top: 20px; /* Ajusta la posición vertical */
+    right: 20px; /* Ajusta la posición horizontal */
+    padding: 10px 15px;
+    background-color: rgba(0, 123, 255, 0.8); /* Fondo azul semi-transparente */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+    z-index: 1000; /* Asegura que el botón esté por encima del mapa */
+  }
+  
+  /* Efecto hover para el botón */
+  .save-route-button:hover {
+    background-color: rgba(0, 123, 255, 1); /* Cambia el fondo al pasar el mouse */
+  }
+  

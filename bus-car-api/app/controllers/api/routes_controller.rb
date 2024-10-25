@@ -47,6 +47,6 @@ class Api::RoutesController < ApplicationController
 
   # Permit only the allowed parameters for route
   def route_params
-    params.require(:route).permit(:name,:origin, :destination, :via_waypoints, :bus_stops)
+    params.require(:route).permit(:name,:origin, :destination, :via_waypoints, :bus_stops, :user_id)
   end
 end

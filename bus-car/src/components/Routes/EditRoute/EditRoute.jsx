@@ -1,12 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import { GoogleMap, DirectionsRenderer, Marker } from '@react-google-maps/api';
-import { fetchRouteById, updateRoute } from '../../api/routeApi';
-
-const containerStyle = {
-  width: '100%',
-  height: '100vh',
-};
+import EditRouteMap from './EditRouteMap';
+import { fetchRouteById, updateRoute } from '../../../api/routeApi';
+import './EditRoute.css'; // Asegúrate de importar el CSS
 
 const formatWaypoints = (waypoints) => {
   return waypoints.map(point => ({
@@ -15,7 +11,7 @@ const formatWaypoints = (waypoints) => {
   }));
 };
 
-function EditRouteMap() {
+function EditRoute() {
   const { routeId } = useParams();
   const [route, setRoute] = useState(null);
   const [directions, setDirections] = useState(null);
@@ -25,8 +21,6 @@ function EditRouteMap() {
 
   const mapRef = useRef();
   const directionsRendererRef = useRef();
-  
-  // Usando useRef para almacenar los valores actuales del origen y destino
   const originRef = useRef();
   const destinationRef = useRef();
 
@@ -42,14 +36,13 @@ function EditRouteMap() {
         setRoute({ ...data.route, origin, destination, via_waypoints });
         setBusStops(busStops);
         setViaWaypoints(via_waypoints);
-        
-        // Establecer el centro del mapa solo una vez al cargar la ruta
+
         if (origin) {
           setMapCenter(origin);
-          originRef.current = origin; // Guardar el origen actual en useRef
+          originRef.current = origin;
         }
         if (destination) {
-          destinationRef.current = destination; // Guardar el destino actual en useRef
+          destinationRef.current = destination;
         }
       } catch (error) {
         console.error('Error fetching route details:', error);
@@ -87,7 +80,6 @@ function EditRouteMap() {
     setBusStops(prevStops => [...prevStops, newBusStop]);
   };
 
- 
   const handleMarkerClick = (index) => {
     const updatedStops = busStops.filter((_, i) => i !== index);
     setBusStops(updatedStops);
@@ -108,20 +100,19 @@ function EditRouteMap() {
 
     try {
       await updateRoute(routeId, routeToSave);
-      console.log("Ruta actualizada con éxito!\n","id:", routeId,"\ndatos ruta", routeToSave);
+      console.log("Ruta actualizada con éxito!\n", "id:", routeId, "\ndatos ruta", routeToSave);
     } catch (error) {
       console.error('Error actualizando la ruta:', error);
     }
   };
 
-  // Función para verificar si se necesita actualizar el origen y destino
   const updateOriginAndDestination = (newOrigin, newDestination) => {
     if (!originRef.current || (originRef.current.lat !== newOrigin.lat || originRef.current.lng !== newOrigin.lng)) {
       setRoute(prevRoute => ({
         ...prevRoute,
         origin: newOrigin,
       }));
-      originRef.current = newOrigin; // Actualizar referencia
+      originRef.current = newOrigin;
     }
 
     if (!destinationRef.current || (destinationRef.current.lat !== newDestination.lat || destinationRef.current.lng !== newDestination.lng)) {
@@ -129,64 +120,32 @@ function EditRouteMap() {
         ...prevRoute,
         destination: newDestination,
       }));
-      destinationRef.current = newDestination; // Actualizar referencia
+      destinationRef.current = newDestination;
     }
   };
 
   return (
-    <div>
-      <button onClick={handleSaveRoute}>Guardar Ruta</button>
-      <GoogleMap
-        mapContainerStyle={containerStyle}
-        center={mapCenter}
-        zoom={14}
-        onLoad={handleMapLoad}
-        onClick={handleMapClick}
-        options={{gestureHandling: 'greedy' }}
-      >
-        {directions && (
-          <DirectionsRenderer
-            directions={directions}
-            options={{ draggable: true }}
-            onLoad={(ref) => { directionsRendererRef.current = ref; }}
-            onDirectionsChanged={() => {
-              if (directionsRendererRef.current) {
-                const waypoints = directionsRendererRef.current.getDirections().routes[0].legs[0].via_waypoints;
-                const updatedWaypoints = waypoints.map(waypoint => ({
-                  lat: waypoint.lat(),
-                  lng: waypoint.lng(),
-                }));
-                setViaWaypoints(updatedWaypoints);
-                
-                // Actualizar origen y destino basado en arrastre
-                const newOrigin = {
-                  lat: directionsRendererRef.current.getDirections().routes[0].legs[0].start_location.lat(),
-                  lng: directionsRendererRef.current.getDirections().routes[0].legs[0].start_location.lng(),
-                };
-                const newDestination = {
-                  lat: directionsRendererRef.current.getDirections().routes[0].legs[0].end_location.lat(),
-                  lng: directionsRendererRef.current.getDirections().routes[0].legs[0].end_location.lng(),
-                };
-
-                // Llamar a la función para actualizar origen y destino
-                updateOriginAndDestination(newOrigin, newDestination);
-              }
-            }}
-          />
-        )}
-        {busStops.map((stop, index) => (
-          <Marker
-            key={`bus-stop-${index}`}
-            position={{ lat: stop.lat, lng: stop.lng }}
-            label={{ text: `${index + 1}`, color: 'white', fontWeight: 'bold' }}
-            onClick={() => handleMarkerClick(index)}
-            draggable
-            onDragEnd={(event) => handleMarkerDragEnd(index, event)}
-          />
-        ))}
-      </GoogleMap>
+    <div style={{ position: 'relative', height: '100vh' }}>
+      <EditRouteMap
+        mapCenter={mapCenter}
+        directions={directions}
+        busStops={busStops}
+        handleMapLoad={handleMapLoad}
+        handleMapClick={handleMapClick}
+        handleMarkerClick={handleMarkerClick}
+        handleMarkerDragEnd={handleMarkerDragEnd}
+        directionsRendererRef={directionsRendererRef}
+        updateOriginAndDestination={updateOriginAndDestination}
+        viaWaypoints={viaWaypoints}
+        setViaWaypoints={setViaWaypoints}
+      />
+      
+      {/* Botón para guardar la ruta en la esquina superior derecha */}
+      <button className="save-route-button" onClick={handleSaveRoute}>
+        Guardar Ruta
+      </button>
     </div>
   );
 }
 
-export default EditRouteMap;
+export default EditRoute;

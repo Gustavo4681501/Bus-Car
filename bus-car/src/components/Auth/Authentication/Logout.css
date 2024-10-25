@@ -1,0 +1,31 @@
+/* Estilos para el contenedor de cierre de sesión */
+.logout-container {
+    display: flex;
+    justify-content: flex-end; /* Alinear a la derecha */
+
+  }
+  
+  /* Estilos para el botón de cerrar sesión */
+  .logout-button {
+    padding: 10px 20px; /* Padding superior/inferior y lateral */
+    background-color: #dc3545; /* Color de fondo rojo */
+    color: white; /* Color del texto blanco */
+    border: none; /* Sin borde */
+    border-radius: 4px; /* Bordes redondeados */
+    cursor: pointer; /* Cambiar cursor al pasar el mouse */
+    font-size: 16px; /* Tamaño de fuente */
+    transition: background-color 0.3s, transform 0.2s; /* Transiciones suaves */
+  }
+  
+  /* Efecto hover para el botón */
+  .logout-button:hover {
+    background-color: #c82333; /* Color más oscuro al pasar el mouse */
+    transform: scale(1.05); /* Agrandar ligeramente el botón */
+  }
+  
+  /* Efecto de enfoque para el botón */
+  .logout-button:focus {
+    outline: none; /* Sin contorno */
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.5); /* Sombra de enfoque */
+  }
+  

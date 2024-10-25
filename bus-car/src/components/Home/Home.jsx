@@ -2,26 +2,22 @@ import React from 'react';
 import './Home.css';
 import Map from '../Map/Map';
 import LocationsList from '../Map/LocationsList';
-import RouteList from '../Routes/RouteList';
-import InteractiveRouteForm from '../Routes/InteractiveRouteForm';
+import RouteList from '../Routes/GetRoute/RouteList/RouteList';
 import LocationManager from '../Routes/LocationManager/LocationManager';
+import CreateRoute from '../Routes/CreateRoute/CreateRoute';
+import BuscarNavbar from '../Navbar/Navbar';
 
 function Home() {
 
   return (
-    <div className="p-5">
-      <div><h1>Bus-car ubicaciones</h1></div>
-
-      <div className="mb-3">
-        <input type="text" className="form-control" placeholder="Buscar ruta" />
-      </div>
-
+    <div className="p-5 container">
+       <BuscarNavbar/>
       <div className="map-container">
         <div id="map-container">
+         
           <LocationManager />
-          <LocationsList />
           <RouteList />
-          <InteractiveRouteForm onRouteCreated={(newRoute) => console.log(newRoute)} />
+          <LocationsList />
           <Map />
         </div>
       </div>

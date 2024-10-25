@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import './ResetPasswordRequest.css'; // Asegúrate de importar el CSS
 
 const ResetPasswordRequest = () => {
   const [email, setEmail] = useState('');
@@ -31,21 +32,24 @@ const ResetPasswordRequest = () => {
   };
 
   return (
-    <div>
-      <h2>Forgot Password</h2>
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="email">Email:</label>
+    <div className="reset-password-container">
+      <h2 className="reset-password-title">¿Olvidaste tu Contraseña?</h2>
+      <form className="reset-password-form" onSubmit={handleSubmit}>
+        <label htmlFor="email" className="reset-password-label">Ingresa tu correo electrónico:</label>
+
         <input
           type="email"
           id="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
+          className="reset-password-input"
+          placeholder="ejemplo@ejemplo.com"
         />
-        <button type="submit">Submit</button>
+        <button type="submit" className="reset-password-button">Enviar correo de restablecimiento</button>
       </form>
-      {message && <p>{message}</p>}
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {message && <p className="reset-password-message success">{message}</p>}
+      {error && <p className="reset-password-message error">{error}</p>}
     </div>
   );
 };

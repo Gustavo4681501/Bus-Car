@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import './ResetPassword.css'; // Asegúrate de agregar un archivo de estilo CSS
 
 const ResetPassword = () => {
   const { reset_password_token } = useParams();
@@ -24,11 +25,11 @@ const ResetPassword = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            user: {
-                password: password,
-                password_confirmation: confirmPassword,
-                reset_password_token: reset_password_token
-              }
+          user: {
+            password: password,
+            password_confirmation: confirmPassword,
+            reset_password_token: reset_password_token
+          }
         }),
       });
 
@@ -47,34 +48,38 @@ const ResetPassword = () => {
   };
 
   return (
-    <div>
-      <h2>Reset Password</h2>
+    <div className="reset-password-container">
+      <h2 className="reset-password-title">Reset Your Password</h2>
       {success ? (
-        <p>Password reset successfully! Redirecting to home...</p>
+        <p className="reset-password-success">Password reset successfully! Redirecting to home...</p>
       ) : (
-        <form onSubmit={handleSubmit}>
-          <div>
-            <label htmlFor="password">New Password:</label>
+        <form className="reset-password-form" onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label htmlFor="password" className="reset-password-label">New Password:</label>
             <input
               type="password"
               id="password"
+              className="reset-password-input"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              placeholder="Enter new password"
             />
           </div>
-          <div>
-            <label htmlFor="confirmPassword">Confirm Password:</label>
+          <div className="form-group">
+            <label htmlFor="confirmPassword" className="reset-password-label">Confirm Password:</label>
             <input
               type="password"
               id="confirmPassword"
+              className="reset-password-input"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
+              placeholder="Confirm new password"
             />
           </div>
-          {error && <p style={{ color: 'red' }}>{error}</p>}
-          <button type="submit">Reset Password</button>
+          {error && <p className="reset-password-error">{error}</p>}
+          <button type="submit" className="reset-password-button">Reset Password</button>
         </form>
       )}
     </div>

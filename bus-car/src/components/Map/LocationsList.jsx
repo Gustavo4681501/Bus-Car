@@ -19,9 +19,9 @@ function LocationsList() {
   return (
     <div>
       <h2>Lista de ubicaciones</h2>
-      <ul>
+      <ul className='d-flex gap-2'>
         {locations.map((loc) => (
-          <li key={loc.user_id}>
+          <li key={loc.user_id} className='list-unstyled'>
             <button onClick={() => handleSelectRoute({ lat: loc.latitude, lng: loc.longitude })}>
               Ver ruta hacia {loc.user_id}
             </button>

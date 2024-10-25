@@ -1,0 +1,21 @@
+/* Estilos para el botón de tráfico */
+.traffic-button {
+    position: absolute;
+    top: 20px; /* Ajusta la posición vertical */
+    right: 20px; /* Ajusta la posición horizontal */
+    padding: 10px 15px;
+    background-color: rgba(0, 0, 0, 0.7); /* Fondo semi-transparente */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+    z-index: 1000; /* Asegura que el botón esté por encima del mapa */
+  }
+  
+  /* Efecto hover para el botón */
+  .traffic-button:hover {
+    background-color: rgba(0, 0, 0, 0.9); /* Cambia el fondo al pasar el mouse */
+  }
+  
