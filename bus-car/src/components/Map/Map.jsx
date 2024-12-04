@@ -79,7 +79,7 @@ function Map() {
     <div id="map-container">
         <GoogleMap
           mapContainerStyle={containerStyle}
-          center={userLocation || { lat: 0, lng: 0 }} // Asegúrate de que el mapa tenga un centro predeterminado
+          center={userLocation ||{ lat: 9.945771786956337, lng: -84.19012069702148 }} // Asegúrate de que el mapa tenga un centro predeterminado
           zoom={14}
           onLoad={handleMapLoad}
           options={{

@@ -35,7 +35,7 @@ const LocationManager = () => {
     }
   }, [currUser]);
 
-  //este debe ser el que envia la location al api hacer global
+  //este debe ser el que envia la location al api ESTA DUPLICADO EN EL GETROUTE
   useEffect(() => {
     if (currUser && userLocation) {
       if (!location || location.latitude !== userLocation.lat || location.longitude !== userLocation.lng) {

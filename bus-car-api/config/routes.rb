@@ -14,10 +14,10 @@ Rails.application.routes.draw do
       passwords: 'users/passwords'
     }
    
-    devise_scope :user do
-      post '/forgot_password', to: 'users/passwords#forgot_password'
-      put '/password/edit', to: 'users/passwords#update' 
-    end
+  devise_scope :user do
+    post '/forgot_password', to: 'users/passwords#forgot_password'
+    put '/password/edit', to: 'users/passwords#update' 
+  end
 
   namespace :api do
     resources :locations, only: [:index, :create, :update, :destroy] do
@@ -25,6 +25,7 @@ Rails.application.routes.draw do
         get 'user/:user_id', to: 'locations#show_by_user_id'
         delete 'user/:user_id', to: 'locations#destroy'  # Ruta para eliminar por user_id
         put '/user/:user_id', to: 'locations#update_by_user'
+        get 'route/:route_id', to: 'locations#show_by_route_id' # Ruta para obtener por route_id
       end
     end
     resources :routes, only: [:index, :show, :create, :update, :destroy]

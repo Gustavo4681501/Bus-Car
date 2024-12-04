@@ -1,4 +1,4 @@
-import React, { useRef, useContext } from 'react';
+import React, { useRef, useContext, useState } from 'react';
 import { SessionContext } from './SessionContext'; // Importar el contexto
 import { jwtDecode } from "jwt-decode";
 import { signupUser } from '../../../api/authApi'; // Importar la función de autenticación
@@ -7,9 +7,11 @@ import './Signup.css'; // Asegúrate de importar el CSS
 const Signup = ({ setShow }) => {
   const formRef = useRef();
   const { setCurrUser } = useContext(SessionContext); // Acceder al contexto
+  const [error, setError] = useState(null); // Estado para el mensaje de error
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(null); // Resetea el error al intentar registrarse nuevamente
     const formData = new FormData(formRef.current);
     const data = Object.fromEntries(formData);
     const userInfo = {
@@ -18,14 +20,12 @@ const Signup = ({ setShow }) => {
 
     try {
       const token = await signupUser(userInfo);
-      
-      // Decodifica el token y actualiza el estado del contexto
       const decodedToken = jwtDecode(token);
       setCurrUser(decodedToken);
-
       // Opcional: Redirigir o hacer algo después del registro exitoso
     } catch (error) {
-      console.log('Error during signup:', error);
+      console.error('Error during signup:', error);
+      setError("Hubo un problema al registrarte. Por favor, revisa tus credenciales.");
     }
 
     e.target.reset();
@@ -40,6 +40,8 @@ const Signup = ({ setShow }) => {
     <div className="signup-container">
       <form ref={formRef} onSubmit={handleSubmit} className="signup-form">
         <h2>Registro</h2>
+        {/* Mostrar el mensaje de error si existe */}
+        {error && <p className="error-message">{error}</p>}
         <div className="form-group">
           <label>Email:</label>
           <input type="email" name="email" placeholder="Ingrese su email" required />

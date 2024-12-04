@@ -14,7 +14,9 @@ export const fetchLocations = async () => {
     const response = await axios.get(`${BASE_URL}/locations`);
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.error || 'An error occurred while fetching locations');
+    console.error('Error fetching locations:', error.message);
+    // Devuelve un array vacío para evitar errores en el frontend
+    return [];
   }
 };
 
@@ -33,6 +35,28 @@ export const fetchLocationByUserId = async (userId) => {
     throw new Error(error.response?.data?.error || 'An error occurred while fetching the location');
   }
 };
+
+
+// ---------------------FETCH LOCATIONS BY ROUTE ID--------------------------------
+/**
+ * Obtiene ubicaciones específicas según el ID de la ruta.
+ * @param {number|string} routeId - ID de la ruta.
+ * @returns {Promise<Array>} - Lista de ubicaciones.
+ * @throws {Error} - Error en caso de fallo en la solicitud.
+ */
+export const fetchLocationsByRouteId = async (routeId) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/locations/route/${routeId}`);
+    return response.data; // Si no hay ubicaciones, esto será un array vacío
+  } catch (error) {
+    // Solo lanzar error si hay un problema con la solicitud
+    if (error.response?.status !== 404) {
+      throw new Error(error.response?.data?.error || 'An error occurred while fetching locations for the route');
+    }
+    return []; // Retorna un array vacío si no se encuentran ubicaciones
+  }
+};
+
 
 // ---------------------CREATE NEW LOCATION--------------------------------
 /**

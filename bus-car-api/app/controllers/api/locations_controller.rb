@@ -20,6 +20,16 @@ class Api::LocationsController < ApplicationController
     end
   end
 
+  # GET /api/locations/route/:route_id
+  def show_by_route_id
+    locations = Location.where(route_id: params[:route_id])
+    if locations.any?
+      render json: locations
+    else
+      render json: { error: 'No locations found for this route' }, status: :not_found
+    end
+  end
+
   # POST /api/locations
   def create
     location = Location.new(location_params)
@@ -30,7 +40,7 @@ class Api::LocationsController < ApplicationController
     end
   end
 
- # PATCH/PUT /locations/1
+  # PATCH/PUT /locations/1
   def update
     if @location.update(location_params)
       render json: @location

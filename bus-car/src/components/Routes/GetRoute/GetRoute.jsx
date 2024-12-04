@@ -2,10 +2,10 @@ import React, { useEffect, useState, useRef, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import { fetchRouteById } from '../../../api/routeApi';
 import GetRouteMap from './GetRouteMap';
-import useUserLocation from './../../Location/useUserLocation'; // Importar el hook
-import { fetchLocations } from '../../../api/locationApi';
+import useUserLocation from './../../Location/useUserLocation';
+import { fetchLocationsByRouteId } from '../../../api/locationApi';
 import { SessionContext } from '../../Auth/Authentication/SessionContext';
-import {updateLocation } from '../../../api/locationApi';
+import { updateLocation } from '../../../api/locationApi';
 
 const formatWaypoints = (via_waypoints) => {
   return via_waypoints.map(point => ({
@@ -34,15 +34,31 @@ const getDirections = (route, setDirections) => {
   });
 };
 
+const getClosestRoute = (userLocation, busStop, setNewRoute) => {
+  const directionsService = new window.google.maps.DirectionsService();
+  directionsService.route({
+    origin: new window.google.maps.LatLng(userLocation.lat, userLocation.lng),
+    destination: new window.google.maps.LatLng(busStop.lat, busStop.lng),
+    travelMode: window.google.maps.TravelMode.DRIVING,
+  }, (result, status) => {
+    if (status === window.google.maps.DirectionsStatus.OK) {
+      setNewRoute(result);
+    } else {
+      console.error('Error fetching closest route:', status);
+    }
+  });
+};
+
 function GetRoute() {
   const { routeId } = useParams();
   const [route, setRoute] = useState(null);
   const [locations, setLocations] = useState([]);
   const [directions, setDirections] = useState(null);
   const [busStops, setBusStops] = useState([]);
-  const userLocation = useUserLocation(); // Usar el hook para la ubicación del usuario
-  const [showTraffic, setShowTraffic] = useState(false); 
-  const mapRef = useRef(null); 
+  const [newRoute, setNewRoute] = useState(null); // Nueva ruta a la parada seleccionada
+  const userLocation = useUserLocation();
+  const [showTraffic, setShowTraffic] = useState(false);
+  const mapRef = useRef(null);
   const trafficLayerRef = useRef(null);
   const { currUser } = useContext(SessionContext);
 
@@ -90,44 +106,60 @@ function GetRoute() {
     }
   }, [showTraffic]);
 
-   // Fetch de ubicaciones de otros usuarios
-   useEffect(() => {
+  useEffect(() => {
     const updateLocations = async () => {
-      const locationsData = await fetchLocations(); // Usar la función fetchLocations
+      const locationsData = await fetchLocationsByRouteId(routeId);
       setLocations(locationsData);
     };
 
     updateLocations();
-    const intervalId = setInterval(updateLocations, 5000); // Actualiza cada 5 segundos
+    const intervalId = setInterval(updateLocations, 5000);
 
     return () => clearInterval(intervalId);
   }, []);
 
-  // useEffect(() => {
-  //   if (currUser && userLocation) {
-  //     if (!locations || locations.latitude !== userLocation.lat || locations.longitude !== userLocation.lng) {
-  //       updateLocation(currUser.sub, {
-  //         latitude: userLocation.lat,
-  //         longitude: userLocation.lng
-  //       }).then(updatedLocation => {
-  //         setLocations(updatedLocation);
-  //       })
-  //         .catch(console.error);
-  //     }
-  //   }
-  // }, [currUser, userLocation]);
+  useEffect(() => {
+    if (currUser && userLocation) {
+      const userCurrentLocation = locations.find(
+        (loc) => loc.id === currUser.sub && loc.latitude === userLocation.lat && loc.longitude === userLocation.lng
+      );
+
+      if (!userCurrentLocation) {
+        updateLocation(currUser.sub, {
+          latitude: userLocation.lat,
+          longitude: userLocation.lng,
+        }).catch(console.error);
+      }
+    }
+  }, [currUser, userLocation]);
 
   return (
     <GetRouteMap
-      directions={directions}
-      route={route}
-      locations={locations}
-      busStops={busStops}
-      userLocation={userLocation}
-      showTraffic={showTraffic}
-      mapRef={mapRef}
-      setShowTraffic={setShowTraffic}
-    />
+    directions={directions}
+    newRoute={newRoute}
+    route={route}
+    locations={locations}
+    busStops={busStops}
+    userLocation={userLocation}
+    showTraffic={showTraffic}
+    mapRef={mapRef}
+    setShowTraffic={setShowTraffic}
+    onBusStopClick={(busStop) => {
+      if (window.confirm(`¿Ver ruta hacia la parada ${busStop.lat}, ${busStop.lng}?`)) {
+        getClosestRoute(userLocation, busStop, setNewRoute);
+      }
+    }}
+    onOriginClick={() => {
+      if (window.confirm('¿Ver ruta hacia el origen?')) {
+        getClosestRoute(userLocation, route.origin, setNewRoute);
+      }
+    }}
+    onDestinationClick={() => {
+      if (window.confirm('¿Ver ruta hacia el destino?')) {
+        getClosestRoute(userLocation, route.destination, setNewRoute);
+      }
+    }}
+  />
   );
 }
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
 import { saveRoute } from "../../../api/routeApi";
 import CreateRouteMap from "./CreateRouteMap";
-import useUserLocation from "./../../Location/useUserLocation"; // Importa el hook
+import useUserLocation from "./../../Location/useUserLocation"; 
 import { SessionContext } from "../../Auth/Authentication/SessionContext";
 
 function CreateRoute() {
@@ -11,6 +11,8 @@ function CreateRoute() {
   const [destination, setDestination] = useState("");
   const [addingBusStops, setAddingBusStops] = useState(false);
   const [busStops, setBusStops] = useState([]);
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
 
   const mapRef = useRef();
   const directionsRendererRef = useRef();
@@ -20,14 +22,12 @@ function CreateRoute() {
   const userLocation = useUserLocation();
   const { currUser } = useContext(SessionContext);
 
-  // Centra el mapa en la ubicación del usuario cuando está disponible
   useEffect(() => {
     if (userLocation && mapRef.current) {
       mapRef.current.setCenter(userLocation);
     }
   }, [userLocation]);
 
-  // Calcular ruta
   useEffect(() => {
     if (origin && destination) {
       const request = {
@@ -51,9 +51,7 @@ function CreateRoute() {
     mapRef.current = mapInstance;
 
     const initAutocomplete = (ref, setPlace) => {
-      const autocomplete = new window.google.maps.places.Autocomplete(
-        ref.current
-      );
+      const autocomplete = new window.google.maps.places.Autocomplete(ref.current);
       autocomplete.bindTo("bounds", mapInstance);
       autocomplete.addListener("place_changed", () => {
         const place = autocomplete.getPlace();
@@ -90,37 +88,46 @@ function CreateRoute() {
   const handleSaveRoute = () => {
     const updatedDirections = directionsRendererRef.current?.getDirections();
     if (updatedDirections) {
-      const { start_location, end_location, via_waypoints } =
-        updatedDirections.routes[0].legs[0];
+      const { start_location, end_location, via_waypoints } = updatedDirections.routes[0].legs[0];
       const points = {
         name: name,
-        origin: {
-          lat: start_location.lat(),
-          lng: start_location.lng(),
-        },
-        destination: {
-          lat: end_location.lat(),
-          lng: end_location.lng(),
-        },
-        via_waypoints: via_waypoints.map((wp) => ({
-          lat: wp.lat(),
-          lng: wp.lng(),
-        })),
+        origin: { lat: start_location.lat(), lng: start_location.lng() },
+        destination: { lat: end_location.lat(), lng: end_location.lng() },
+        via_waypoints: via_waypoints.map((wp) => ({ lat: wp.lat(), lng: wp.lng() })),
         bus_stops: busStops,
         user_id: currUser ? currUser.sub : null,
       };
 
       saveRoute(points)
         .then((response) => {
-          console.log("Ruta guardada correctamente:", response);
+          setSuccessMessage("Ruta guardada correctamente");
+          setName("");
+          setOrigin("");
+          setDestination("");
+          setBusStops([]);
+          setDirections(null);
+
+          setTimeout(() => {
+            setSuccessMessage(null);
+          }, 3000);
         })
-        .catch((error) => console.error("Error saving route:", error));
+        .catch((error) => {
+          setErrorMessage("Error al guardar la ruta. Por favor, intenta de nuevo.");
+          console.error("Error saving route:", error);
+
+          setTimeout(() => {
+            setErrorMessage(null);
+          }, 3000);
+        });
     }
   };
 
   return (
     <div className="container mt-5">
       <h2 className="text-center mb-4">Crear Ruta</h2>
+      {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
+      {successMessage && <div className="alert alert-success">{successMessage}</div>}
+      
       <div className="form-group">
         <span>Nombre de la Ruta</span>
         <input
@@ -159,7 +166,7 @@ function CreateRoute() {
           Guardar Ruta
         </button>
         <button className="btn btn-warning m-2" onClick={toggleAddBusStops}>
-          {addingBusStops? "Desactivar Paradas de Buses" : "Activar Paradas de Buses"}
+          {addingBusStops ? "Desactivar Paradas de Buses" : "Activar Paradas de Buses"}
         </button>
       </div>
       <CreateRouteMap
